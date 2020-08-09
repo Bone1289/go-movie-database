@@ -74,8 +74,15 @@ func CreateEndpoint(w http.ResponseWriter, req *http.Request) {
 func main() {
 	fmt.Println("Starting server at http://localhost:12345...")
 	cluster, _ := gocb.Connect("couchbase://172.17.0.2")
+	err := cluster.Authenticate(gocb.PasswordAuthenticator{
+		Username: "admin",
+		Password: "admin12345",
+	})
+	if err != nil {
+		panic(err)
+	}
 	bucketName = "go-restfull-sample"
-	bucket, _ = cluster.OpenBucket(bucketName, "BoneBroker")
+	bucket, _ = cluster.OpenBucket(bucketName, "")
 	router := mux.NewRouter()
 	router.HandleFunc("/movies", ListEndpoint).Methods("GET")
 	router.HandleFunc("/movies", CreateEndpoint).Methods("POST")
